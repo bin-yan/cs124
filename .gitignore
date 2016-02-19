@@ -48,3 +48,7 @@ Thumbs.db
 .idea
 /prog1/.idea
 *.idea
+
+prog1/CMakeLists.txt
+
+prog1/CMakeLists.txt
