@@ -7,31 +7,29 @@
 #include <time.h>
 #include <limits>
 
+// Number of vertices in the graph
+#define V 4
 
 class Graph {
+    int num_vertices;
     float *edge_weights;
 public:
-    int num_vertices;
     Graph(int _num_vertices) {
         num_vertices = _num_vertices;
         edge_weights = (float*)malloc(sizeof(float) * (num_vertices - 1) * num_vertices / 2);
-        if (edge_weights == NULL) {
-            printf("error");
-        }
     }
 
     float &edge (int i, int j) {
         if (i > j) {
-            return edge_weights[(i-1) * i / 2 + j];
+            return edge_weights[(i-1)/2 * i + j];
         } else if (j > i) {
-            return edge_weights[(j-1) * j / 2 + i];
+            return edge_weights[(j-1)/2 * j + i];
         } else {
             float m = INT_MAX;
             return m;
         }
 
     }
-
 
     void printGraph() {
         for (int i =0; i < num_vertices; i++) {
@@ -44,24 +42,22 @@ public:
 
 // A utility function to find the vertex with minimum key value, from
 // the set of vertices not yet included in MST
-int minKey(float key[], bool mstSet[], int V)
+int minKey(float key[], bool mstSet[])
 {
     // Initialize min value
-    float min = INT_MAX, min_index;
+    int min = INT_MAX, min_index;
 
     for (int v = 0; v < V; v++) {
-        if (mstSet[v] == false && key[v] < min) {
+        if (mstSet[v] == false && key[v] < min)
             min = key[v], min_index = v;
-        }
     }
 
     return min_index;
 }
 
 // A utility function to print the constructed MST stored in parent[]
-int printMST(int parent[], Graph *graph)
+int printMST(int parent[], int n, Graph *graph)
 {
-    int V = graph->num_vertices;
     printf("Edge   Weight\n");
     for (int i = 1; i < V; i++)
         printf("%d - %d    %f \n", parent[i], i, graph->edge(i, parent[i]));
@@ -71,7 +67,6 @@ int printMST(int parent[], Graph *graph)
 // matrix representation
 void primMST(Graph *graph)
 {
-    int V = graph->num_vertices;
     int parent[V]; // Array to store constructed MST
     float key[V];   // Key values used to pick minimum weight edge in cut
     bool mstSet[V];  // To represent set of vertices not yet included in MST
@@ -89,8 +84,7 @@ void primMST(Graph *graph)
     {
         // Pick thd minimum key vertex from the set of vertices
         // not yet included in MST
-        int u = minKey(key, mstSet, V);
-        //printf("%d\n", u);
+        int u = minKey(key, mstSet);
 
         // Add the picked vertex to the MST Set
         mstSet[u] = true;
@@ -105,44 +99,45 @@ void primMST(Graph *graph)
                 parent[v]  = u, key[v] = graph->edge(u,v);
     }
 
-    printf("%f", graph->edge(V-1,V-2));
-
     // print the constructed MST
-    //printMST(parent, graph);
+    printMST(parent, V, graph);
 }
 
 
 
-Graph *constructGraph(int V)
+Graph *constructGraph()
 {
     int u, v;
     Graph *graph = new Graph(V);
     //srand((unsigned)time(NULL));
-    srand(42);
     for(u = 0; u < V; u++)
     {
         for(v = 0; v < u; v++)
         {
             graph->edge(u,v) = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-
         }
     }
-    //graph->printGraph();
+    graph->printGraph();
     return graph;
 }
-
 
 
 // driver program to test above function
 int main()
 {
-    int V = 46342;
+    /* Let us create the following graph
+           2    3
+       (0)--(1)--(2)
+        |   / \   |
+       6| 8/   \5 |7
+        | /     \ |
+       (3)-------(4)
+             9          */
 
-    Graph *graph =  constructGraph(V);
+    Graph *graph =  constructGraph();
 
     // Print the solution
     primMST(graph);
-    printf("done, %d", V);
 
     return 0;
 }
