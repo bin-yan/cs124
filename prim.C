@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <limits>
 #include <stdio.h>
+#include <cmath>
 
 using namespace std;
 
@@ -46,6 +47,30 @@ struct AdjacencyMatrixGraph : public Graph {
     }
 };
 
+// A complete graph on random points in [0,1]^2.
+struct EuclideanGraph : public Graph {
+    float *coordinates;
+    int dimension;
+
+    EuclideanGraph (int _num_nodes, int _dimension) : Graph(_num_nodes), dimension(_dimension) {
+	coordinates = (float*)malloc(sizeof(float) * num_nodes * dimension);
+	for (int i=0; i<num_nodes*dimension; i++) {
+	    coordinates[i] = (float)rand() / RAND_MAX;
+	}	
+    }
+
+    ~EuclideanGraph() {
+	free(coordinates);
+    }
+
+    float edge(int i, int j) {
+	float sum;
+	for (int k=0; k<dimension; k++) {
+	    sum += coordinates[i*dimension + k] * coordinates[j*dimension + k];
+	}
+	return sqrt(sum);
+    }
+};
 
 // A complete graph, with random edge weights in [0,1] computed by a simple hash function.
 struct HashGraph : public Graph {
@@ -158,17 +183,19 @@ int main(int argc, char *argv[]) {
 
     printf("randmst %d %d %d %d\n", flag, numpoints, numtrials, dimension);
 
-    const int N = 65536;
+    const int N = 20000;
     //const int N = 20000;
 
-    printf("Making a random graph.\n");
+    //printf("Making a random graph.\n");
     /*
     AdjacencyMatrixGraph g(N);
     for (int i=0; i<N; i++)
 	for (int j=0; j<=i; j++) 
 	    g.setEdge(i,j,   (float)rand() / RAND_MAX);
     */
-    HashGraph g(N, 0);
+    //HashGraph g(N, 0);
+
+    EuclideanGraph g(N, 4);
 
     printf("Running Prim's algoritm.\n");
     printf("Weight of the tree is %f\n", mst(g));
