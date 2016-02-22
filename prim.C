@@ -47,6 +47,8 @@ struct AdjacencyMatrixGraph : public Graph {
     }
 };
 
+float square(float x) { return x*x; }
+
 // A complete graph on random points in [0,1]^2.
 struct EuclideanGraph : public Graph {
     float *coordinates;
@@ -64,9 +66,9 @@ struct EuclideanGraph : public Graph {
     }
 
     float edge(int i, int j) {
-	float sum;
+	float sum = 0.0;
 	for (int k=0; k<dimension; k++) {
-	    sum += coordinates[i*dimension + k] * coordinates[j*dimension + k];
+	    sum += square(coordinates[i*dimension + k] - coordinates[j*dimension + k]);
 	}
 	return sqrt(sum);
     }
@@ -183,8 +185,7 @@ int main(int argc, char *argv[]) {
 
     printf("randmst %d %d %d %d\n", flag, numpoints, numtrials, dimension);
 
-    const int N = 20000;
-    //const int N = 20000;
+    const int N = 10000;
 
     //printf("Making a random graph.\n");
     /*
@@ -193,11 +194,13 @@ int main(int argc, char *argv[]) {
 	for (int j=0; j<=i; j++) 
 	    g.setEdge(i,j,   (float)rand() / RAND_MAX);
     */
+    //HashGraph g(N, rand());
+ 
     //HashGraph g(N, 0);
 
     EuclideanGraph g(N, 4);
 
-    printf("Running Prim's algoritm.\n");
+    printf("Running Prim's algorithm.\n");
     printf("Weight of the tree is %f\n", mst(g));
 
     return 0;
