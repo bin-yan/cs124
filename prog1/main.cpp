@@ -1,21 +1,4 @@
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-#include <iostream>
-
-using namespace std;
-
-int main() {
-    cout << "Hello, World!" << endl;
-    return 0;
-}
-=======
-// A C / C++ program for Prim's Minimum Spanning Tree (MST) algorithm. 
-// The program is for adjacency matrix representation of the graph
-
-=======
->>>>>>> Stashed changes
 #include <stdio.h>
-#include <limits.h>
 #include <stdlib.h>
 #include <time.h>
 #include <limits>
@@ -239,7 +222,7 @@ int main(int argc, char *argv[])
                 graph = new HashGraph(numpoints, rand());
             }
         } else {
-                graph = new EuclideanGraph(numpoints, dimension);
+            graph = new EuclideanGraph(numpoints, dimension);
         }
 
 
@@ -255,4 +238,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
->>>>>>> eabbf05c7193b86a35ec05d13f67d0a389edf480
