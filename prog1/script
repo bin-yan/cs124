@@ -9,6 +9,7 @@ do
     done
 done
 
+
 for dimension in 1 2 3 4;
 do
     for numpoints in 2048 4096 8192 16384;
@@ -25,3 +26,4 @@ do
         ./randmst 0 $numpoints 5 $dimension;
     done
 done
+

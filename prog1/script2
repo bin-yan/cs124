@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+for dimension in 1 2 3 4;
+do
+    for numpoints in 16 32 64 128 256 512 1024;
+    do
+        ./randmst 0 $numpoints 40 $dimension;
+    done
+done
+
+
+
