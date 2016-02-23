@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-#include <iostream>
-
-using namespace std;
-
-int main() {
-    cout << "Hello, World!" << endl;
-    return 0;
-}
-=======
 // A C / C++ program for Prim's Minimum Spanning Tree (MST) algorithm. 
 // The program is for adjacency matrix representation of the graph
 
@@ -16,52 +6,27 @@ int main() {
 #include <stdlib.h>
 #include <time.h>
 #include <limits>
-#include <math.h>
 
 
-struct Graph {
-    //unsigned char *edge_weights;
-    int num_vertices;
-
-    Graph(int _num_vertices) {
-        num_vertices = _num_vertices;
-
-    }
-
-
-    virtual float getEdgeWeights (int i, int j) = 0;
-
-    virtual ~Graph(){};
-
-
-    void printGraph() {
-        for (int i =0; i < num_vertices; i++) {
-            for (int j=0; j < i; j++)
-                printf("%d, %d, %f \n", i, j, getEdgeWeights(i,j));
-        }
-
-    }
-};
-
-struct AdjacencyMatrixGraph : Graph{
+class Graph {
     //unsigned char *edge_weights;
     float *edge_weights;
-
-
-    AdjacencyMatrixGraph (int _num_vertices) : Graph (_num_vertices){
-
+public:
+    int num_vertices;
+    Graph(int _num_vertices) {
+        num_vertices = _num_vertices;
         edge_weights = (float*)malloc(sizeof(float) * (num_vertices - 1) * num_vertices / 2);
         if (edge_weights == NULL) {
             printf("error");
         }
     }
 
-    ~AdjacencyMatrixGraph(){
+    ~Graph(){
         free(edge_weights);
     }
 
 
-    float getEdgeWeights (int i, int j) {
+    float getEdgeWeights (long long int i, long long int j) {
         if (i > j) {
             return edge_weights[(i-1) * i / 2 + j];
         } else if (j > i) {
@@ -79,60 +44,14 @@ struct AdjacencyMatrixGraph : Graph{
             edge_weights[(j-1) * j / 2 + i] = weight;
         }
     }
-};
-
-struct HashGraph : public Graph {
-    int seed;
-
-    HashGraph (int _num_vertices, int _seed) : Graph(_num_vertices), seed(_seed) {}
-
-    float getEdgeWeights(int i, int j) {
-        if (i<j) return getEdgeWeights(j,i);
-
-        unsigned int val = seed;
-
-        val +=i;
-        val *= 1103515245;
-        val += (val << 10);
-        val ^= (val >> 6);
-        val += (val << 3);
-        val ^= (val >> 11);
-        val += (val << 15);
-
-        val +=j;
-        val *= 1103515245;
-        val += (val << 10);
-        val ^= (val >> 6);
-        val += (val << 3);
-        val ^= (val >> 11);
-        val += (val << 15);
 
 
-        return (float)(val & 0xFFFFFFFF) / (float)0xFFFFFFFF;
-    }
-};
-
-struct EuclideanGraph : public Graph {
-    float *coordinates;
-    int dimension;
-
-    EuclideanGraph (int _num_vertices, int _dimension) : Graph(_num_vertices), dimension(_dimension) {
-        coordinates = (float*)malloc(sizeof(float) * num_vertices * dimension);
-        for (int i=0; i<num_vertices*dimension; i++) {
-            coordinates[i] = (float)rand() / RAND_MAX;
+    void printGraph() {
+        for (int i =0; i < num_vertices; i++) {
+            for (int j=0; j < i; j++)
+                printf("%d, %d, %f \n", i, j, getEdgeWeights(i,j));
         }
-    }
 
-    ~EuclideanGraph() {
-        free(coordinates);
-    }
-
-    float getEdgeWeights(int i, int j) {
-        float sum = 0;
-        for (int k=0; k<dimension; k++) {
-            sum = sum + (float)pow((coordinates[i*dimension + k] - coordinates[j*dimension + k]), 2);
-        }
-        return sqrt(sum);
     }
 };
 
@@ -222,8 +141,9 @@ float primMST(Graph *graph)
 Graph *constructGraph(int V)
 {
     int u, v;
-    AdjacencyMatrixGraph *graph = new AdjacencyMatrixGraph(V);
-    //srand(42);
+    Graph *graph = new Graph(V);
+    //srand((unsigned)time(NULL));
+    srand(42);
     for(u = 0; u < V; u++)
     {
         for(v = 0; v < u; v++)
@@ -243,8 +163,6 @@ Graph *constructGraph(int V)
 int main(int argc, char *argv[])
 {
 
-    srand((unsigned)time(NULL));
-
     int flag = 0;
     int numpoints = 0;
     int numtrials = 0;
@@ -261,22 +179,9 @@ int main(int argc, char *argv[])
 
     Graph *graph;
     for (int i=0; i<numtrials; i++) {
-        if(dimension==1) {
-            if(numpoints <= 33000) {
-                graph =  constructGraph(numpoints);
-
-            } else {
-                graph = new HashGraph(numpoints, rand());
-                //printf("%f", graph->getEdgeWeights(60000,60001));
-            }
-        } else {
-                graph = new EuclideanGraph(numpoints, dimension);
-        }
-
-
+        graph =  constructGraph(numpoints);
         average = average + primMST(graph);
         delete graph;
-
     }
 
     average = average / numtrials;
@@ -288,4 +193,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
->>>>>>> eabbf05c7193b86a35ec05d13f67d0a389edf480
