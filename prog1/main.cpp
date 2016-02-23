@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <<<<<<< HEAD
 #include <iostream>
 
@@ -11,6 +12,8 @@ int main() {
 // A C / C++ program for Prim's Minimum Spanning Tree (MST) algorithm. 
 // The program is for adjacency matrix representation of the graph
 
+=======
+>>>>>>> Stashed changes
 #include <stdio.h>
 #include <limits.h>
 #include <stdlib.h>
@@ -18,21 +21,17 @@ int main() {
 #include <limits>
 #include <math.h>
 
-
 struct Graph {
-    //unsigned char *edge_weights;
+
     int num_vertices;
 
     Graph(int _num_vertices) {
         num_vertices = _num_vertices;
-
     }
-
 
     virtual float getEdgeWeights (int i, int j) = 0;
 
     virtual ~Graph(){};
-
 
     void printGraph() {
         for (int i =0; i < num_vertices; i++) {
@@ -44,15 +43,23 @@ struct Graph {
 };
 
 struct AdjacencyMatrixGraph : Graph{
-    //unsigned char *edge_weights;
     float *edge_weights;
 
-
     AdjacencyMatrixGraph (int _num_vertices) : Graph (_num_vertices){
-
         edge_weights = (float*)malloc(sizeof(float) * (num_vertices - 1) * num_vertices / 2);
         if (edge_weights == NULL) {
             printf("error");
+        }
+
+        int u, v;
+        for(u = 0; u < num_vertices; u++)
+        {
+            for(v = 0; v < u; v++)
+            {
+                float weight = (float)rand() / RAND_MAX;
+                setEdgeWeights(u, v, weight);
+
+            }
         }
     }
 
@@ -107,7 +114,6 @@ struct HashGraph : public Graph {
         val ^= (val >> 11);
         val += (val << 15);
 
-
         return (float)(val & 0xFFFFFFFF) / (float)0xFFFFFFFF;
     }
 };
@@ -136,110 +142,74 @@ struct EuclideanGraph : public Graph {
     }
 };
 
-// A utility function to find the vertex with minimum key value, from
-// the set of vertices not yet included in MST
-int minKey(float key[], bool mstSet[], int V)
+
+int getNextVertex(float MSTweights[], bool inMST[], int V)
 {
     // Initialize min value
-    float min = INT_MAX, min_index;
+    float min_weight = std::numeric_limits<float>::infinity();
+    int next_vertex;
 
     for (int v = 0; v < V; v++) {
-        if (mstSet[v] == false && key[v] < min) {
-            min = key[v], min_index = v;
+        if (!inMST[v]  && MSTweights[v] < min_weight) {
+            min_weight = MSTweights[v], next_vertex = v;
         }
     }
 
-    return min_index;
+    return next_vertex;
 }
 
-// A utility function to print the constructed MST stored in parent[]
-int printMST(int parent[], Graph *graph)
+void printMST(int MSTparents[], float MSTweights[], int V)
 {
-    int V = graph->num_vertices;
-    printf("Edge   Weight\n");
+    printf("The minimum spanning tree\n");
     for (int i = 1; i < V; i++)
-        printf("%d - %d    %f \n", parent[i], i, graph->getEdgeWeights(i, parent[i]));
+        printf("%d - %d    %f \n", MSTparents[i], i, MSTweights[i]);
 }
 
-float getMSTsize(int parent[], Graph *graph)
+
+float findPrimMST(Graph *graph)
 {
-    float size = 0;
     int V = graph->num_vertices;
-    for (int i = 1; i < V; i++) {
-        size = size + graph->getEdgeWeights(i, parent[i]);
+    int MSTparents[V];
+    float MSTweights[V];
+    bool inMST[V];
+    float MSTsize = 0;
+
+
+    for (int i = 0; i < V; i++) {
+        MSTweights[i] = std::numeric_limits<float>::infinity();
+        inMST[i] = false;
     }
 
-    return size;
+    // vertex 0 as root, include it.
+    MSTweights[0] = 0;
+    MSTparents[0] = -1;
 
-}
 
-// Function to construct and print MST for a graph represented using adjacency
-// matrix representation
-float primMST(Graph *graph)
-{
-    int V = graph->num_vertices;
-    int parent[V]; // Array to store constructed MST
-    float key[V];   // Key values used to pick minimum weight edge in cut
-    bool mstSet[V];  // To represent set of vertices not yet included in MST
-
-    // Initialize all keys as INFINITE
-    for (int i = 0; i < V; i++)
-        key[i] = std::numeric_limits<float>::infinity(), mstSet[i] = false;
-
-    // Always include first 1st vertex in MST.
-    key[0] = 0;     // Make key 0 so that this vertex is picked as first vertex
-    parent[0] = -1; // First node is always root of MST
-
-    // The MST will have V vertices
     for (int count = 0; count < V-1; count++)
     {
-        // Pick thd minimum key vertex from the set of vertices
-        // not yet included in MST
-        int u = minKey(key, mstSet, V);
-        //printf("%d\n", u);
+        int u = getNextVertex(MSTweights, inMST, V);
 
-        // Add the picked vertex to the MST Set
-        mstSet[u] = true;
+        inMST[u] = true;
 
-        // Update key value and parent index of the adjacent vertices of
-        // the picked vertex. Consider only those vertices which are not yet
-        // included in MST
         for (int v = 0; v < V; v++)
 
-            if (graph->getEdgeWeights(u,v) && mstSet[v] == false && graph->getEdgeWeights(u,v) < key[v])
-                // actually edge might be 0.
-                parent[v]  = u, key[v] = graph->getEdgeWeights(u,v);
+            if (!inMST[v] && MSTweights[v] > graph->getEdgeWeights(u,v)) {
+                MSTparents[v]  = u;
+                MSTweights[v] = graph->getEdgeWeights(u,v);
+            }
     }
 
-    return getMSTsize(parent, graph);
+    //caluclate MST size
+    for (int v = 0; v < V; v++){
+        MSTsize = MSTsize + MSTweights[v];
+    }
 
-    // print the constructed MST
-    //printMST(parent, graph);
+    //printMST(MSTparents, MSTweights, V);
+
+    return MSTsize;
 }
 
 
-
-Graph *constructGraph(int V)
-{
-    int u, v;
-    AdjacencyMatrixGraph *graph = new AdjacencyMatrixGraph(V);
-    //srand(42);
-    for(u = 0; u < V; u++)
-    {
-        for(v = 0; v < u; v++)
-        {
-            float weight = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-            graph->setEdgeWeights(u, v, weight);
-
-        }
-    }
-    //graph->printGraph();
-    return graph;
-}
-
-
-
-// driver program to test above function
 int main(int argc, char *argv[])
 {
 
@@ -263,27 +233,24 @@ int main(int argc, char *argv[])
     for (int i=0; i<numtrials; i++) {
         if(dimension==1) {
             if(numpoints <= 33000) {
-                graph =  constructGraph(numpoints);
+                graph =  new AdjacencyMatrixGraph(numpoints);
 
             } else {
                 graph = new HashGraph(numpoints, rand());
-                //printf("%f", graph->getEdgeWeights(60000,60001));
             }
         } else {
                 graph = new EuclideanGraph(numpoints, dimension);
         }
 
 
-        average = average + primMST(graph);
+        average = average + findPrimMST(graph);
         delete graph;
 
     }
 
     average = average / numtrials;
 
-
-    // Print the solution
-
+    // Print the result
     printf("%f %d %d %d\n", average, numpoints, numtrials, dimension);
 
     return 0;
