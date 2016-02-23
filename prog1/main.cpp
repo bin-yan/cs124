@@ -29,6 +29,7 @@ struct AdjacencyMatrixGraph : Graph{
     float *edge_weights;
 
     AdjacencyMatrixGraph (int _num_vertices) : Graph (_num_vertices){
+        // allocate memory in constructor
         edge_weights = (float*)malloc(sizeof(float) * (num_vertices - 1) * num_vertices / 2);
         if (edge_weights == NULL) {
             printf("error");
