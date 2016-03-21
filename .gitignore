@@ -3,9 +3,13 @@ prog1/.idea
 *.idea
 
 prog1/.idea
+prog1/.idea*
+prog1/.idea/*
 prog1/.idea/workspace.xml
 
 prog2/.idea
+prog2/.idea*
+prog2/.idea/*
 
 # Compiled source #
 ###################
