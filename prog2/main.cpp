@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -199,15 +201,19 @@ void strassenPadded(vector< vector<int> > &A,
 int main (int argc, char* argv[]) {
 
     int flag = 0;
-    string filename = "/Users/byan/Documents/2016 Spring/cs124/code/prog2/test.txt";
-    int d = 4;
+    //string filename = "/Users/byan/Documents/2016 Spring/cs124/code/prog2/test.txt";
+    //int d = 4;
+    string filename;
+    int d;
 
     if (argc==4) {
+        printf("test");
         char filename_buf[200];
         sscanf(argv[1], "%d", &flag);
         sscanf(argv[2], "%d", &d);
         sscanf(argv[3], "%s", filename_buf);
-        filename = string(filename_buf);
+        filename = string(filename_buf).c_str();
+        printf("%s", filename.c_str());
     }
 
     int threshold = 1;
