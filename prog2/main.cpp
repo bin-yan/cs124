@@ -1,14 +1,11 @@
-#include <sstream>
-#include <string>
-#include <fstream>
+#include <stdio.h>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <vector>
-#include <algorithm>
 #include <cmath>
 
 using namespace std;
-
-int threshold;
 
 void readFile(string filename, int n, vector< vector<int> > &A, vector< vector<int> > &B) {
     string line;
@@ -67,10 +64,9 @@ void conventional(vector< vector<int> > A,
 void sum(vector< vector<int> > &A,
          vector< vector<int> > &B,
          vector< vector<int> > &C, int n) {
-    int i, j;
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             C[i][j] = A[i][j] + B[i][j];
         }
     }
@@ -79,14 +75,15 @@ void sum(vector< vector<int> > &A,
 void subtract(vector< vector<int> > &A,
               vector< vector<int> > &B,
               vector< vector<int> > &C, int n) {
-    int i, j;
 
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
             C[i][j] = A[i][j] - B[i][j];
         }
     }
 }
+
+
 
 void strassenRecursive(vector< vector<int> > &A,
                vector< vector<int> > &B,
@@ -106,10 +103,8 @@ void strassenRecursive(vector< vector<int> > &A,
                 p1(n_new,inner), p2(n_new,inner), p3(n_new,inner), p4(n_new,inner),
                 p5(n_new,inner), p6(n_new,inner), p7(n_new,inner);
 
-        int i, j;
-
-        for (i = 0; i < n_new; i++) {
-            for (j = 0; j < n_new; j++) {
+        for (int i = 0; i < n_new; i++) {
+            for (int j = 0; j < n_new; j++) {
                 a11[i][j] = A[i][j];
                 a12[i][j] = A[i][j + n_new];
                 a21[i][j] = A[i + n_new][j];
@@ -133,7 +128,7 @@ void strassenRecursive(vector< vector<int> > &A,
 
         vector< vector<int> > temp4(n_new,inner);
         subtract(b12, b22, temp4, n_new); // b12 - b22
-        strassenRecursive(a11, temp4, p3, n_new); // p3 = (a11) * (b12 - b22)
+        strassenRecursive(a11, temp4, p3, n_new, threshold); // p3 = (a11) * (b12 - b22)
 
         vector< vector<int> > temp5(n_new,inner);
         subtract(b21, b11, temp5, n_new); // b21 - b11
@@ -167,8 +162,8 @@ void strassenRecursive(vector< vector<int> > &A,
         subtract(temp14, p2, c22, n_new); // c22 = p1 + p3 - p2 + p6
 
         // Grouping the results obtained in a single matrix:
-        for (i = 0; i < n_new ; i++) {
-            for (j = 0 ; j < n_new ; j++) {
+        for (int i = 0; i < n_new ; i++) {
+            for (int j = 0 ; j < n_new ; j++) {
                 C[i][j] = c11[i][j];
                 C[i][j + n_new] = c12[i][j];
                 C[i + n_new][j] = c21[i][j];
@@ -178,10 +173,33 @@ void strassenRecursive(vector< vector<int> > &A,
     }
 }
 
+void strassenPadded(vector< vector<int> > &A,
+              vector< vector<int> > &B,
+              vector< vector<int> > &C, int n, int threshold) {
+
+    int n_pow2 = pow(2, int(ceil(log2(n))));
+    vector<int> inner(n_pow2);
+    vector< vector<int> > A_pad(n_pow2, inner), B_pad(n_pow2, inner), C_pad(n_pow2, inner);
+
+    for(int i=0; i<n; i++) {
+        for (int j=0; j<n; j++) {
+            A_pad[i][j] = A[i][j];
+            B_pad[i][j] = B[i][j];
+        }
+    }
+
+    strassenRecursive(A_pad, B_pad, C_pad, n_pow2, threshold);
+    for(int i=0; i<n; i++) {
+        for (int j=0; j<n; j++) {
+            C[i][j] = C_pad[i][j];
+        }
+    }
+}
+
 int main (int argc, char* argv[]) {
 
     int flag = 0;
-    string filename = "/Users/binyan/Documents/Study/cs124/code/prog2/test.txt";
+    string filename = "/Users/byan/Documents/2016 Spring/cs124/code/prog2/test.txt";
     int d = 4;
 
     if (argc==4) {
@@ -192,15 +210,17 @@ int main (int argc, char* argv[]) {
         filename = string(filename_buf);
     }
 
-    int threshold = 2;
+    int threshold = 1;
     vector<int> inner (d);
     vector< vector<int> > A(d, inner), B(d, inner), C(d, inner);
 
     readFile (filename, d, A, B);
 
+    strassenPadded(A, B, C, d, threshold);
+
     printMatrix(A, d);
     printMatrix(B, d);
-    conventional(A, B, C, d);
+    //conventional(A, B, C, d);
     printMatrix(C, d);
 
     return 0;
