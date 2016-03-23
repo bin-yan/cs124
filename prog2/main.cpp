@@ -119,6 +119,43 @@ void strassenRecursive(vector< vector<int> > &A,
             }
         }
 
+        vector< vector<int> > temp1(n_new,inner);
+        subtract(b12, b22, temp1, n_new); // b12 - b22
+        strassenRecursive(a11, temp1, p1, n_new, threshold); // p3 = (a11) * (b12 - b22)
+
+        vector< vector<int> > temp2(n_new,inner);
+        sum(a11, a12, temp2, n_new); // a11 + a12
+        strassenRecursive(temp2, b22, p2, n_new, threshold); // p5 = (a11+a12) * (b22)
+
+        vector< vector<int> > temp3(n_new,inner);
+        sum(a21, a22, temp3, n_new); // a21 + a22
+        strassenRecursive(temp3, b11, p3, n_new, threshold); // p2 = (a21+a22) * (b11)
+
+        vector< vector<int> > temp4(n_new,inner);
+        subtract(b21, b11, temp4, n_new); // b21 - b11
+        strassenRecursive(a22, temp4, p4, n_new, threshold); // p4 = (a22) * (b21 - b11)
+
+        vector< vector<int> > temp5(n_new,inner), temp6(n_new,inner);
+        sum(a11, a22, temp5, n_new); // a11 + a22
+        sum(b11, b22, temp6, n_new); // b11 + b22
+        strassenRecursive(temp5, temp6, p5, n_new, threshold); // p1 = (a11+a22) * (b11+b22)
+
+        vector< vector<int> > temp7(n_new,inner), temp8(n_new,inner);
+        subtract(a12, a22, temp7, n_new); // a12 - a22
+        sum(b21, b22, temp8, n_new); // b21 + b22
+        strassenRecursive(temp7, temp8, p6, n_new, threshold); // p7 = (a12-a22) * (b21+b22)
+
+        vector< vector<int> > temp9(n_new,inner), temp10(n_new,inner);
+        subtract(a11, a21, temp9, n_new); // a21 - a11
+        sum(b11, b12, temp10, n_new); // b11 + b12
+        strassenRecursive(temp9, temp10, p7, n_new, threshold); // p6 = (a11-a21) * (b11+b12)
+
+        vector< vector<int> > temp11(n_new,inner), temp12(n_new,inner);
+        sum(p5, p4, temp11, n_new); // p5 + p4
+        sum(temp11, p6, temp12, n_new); // p5 + p4 + p6
+        subtract(temp12, p2, c11, n_new); // c11 = p5 + p4 + p6 - p2
+
+        /*
         vector< vector<int> > temp1(n_new,inner), temp2(n_new,inner);
         sum(a11, a22, temp1, n_new); // a11 + a22
         sum(b11, b22, temp2, n_new); // b11 + b22
@@ -162,6 +199,7 @@ void strassenRecursive(vector< vector<int> > &A,
         sum(p1, p3, temp13, n_new); // p1 + p3
         sum(temp13, p6, temp14, n_new); // p1 + p3 + p6
         subtract(temp14, p2, c22, n_new); // c22 = p1 + p3 - p2 + p6
+         */
 
         // Grouping the results obtained in a single matrix:
         for (int i = 0; i < n_new ; i++) {
