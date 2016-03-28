@@ -50,6 +50,13 @@ void printMatrix(vector< vector<int> > matrix, int n) {
     }
 }
 
+void printResults(vector< vector<int> > matrix, int n) {
+    for (int i=0; i < n; i++) {
+        cout << matrix[i][i];
+        cout << endl;
+    }
+}
+
 void conventional(vector< vector<int> > A,
                   vector< vector<int> > B,
                   vector< vector<int> > &C, int n) {
@@ -119,6 +126,7 @@ void strassenRecursive(vector< vector<int> > &A,
             }
         }
 
+        /*
         vector< vector<int> > temp1(n_new,inner);
         subtract(b12, b22, temp1, n_new); // b12 - b22
         strassenRecursive(a11, temp1, p1, n_new, threshold); // p3 = (a11) * (b12 - b22)
@@ -154,8 +162,9 @@ void strassenRecursive(vector< vector<int> > &A,
         sum(p5, p4, temp11, n_new); // p5 + p4
         sum(temp11, p6, temp12, n_new); // p5 + p4 + p6
         subtract(temp12, p2, c11, n_new); // c11 = p5 + p4 + p6 - p2
+         */
 
-        /*
+
         vector< vector<int> > temp1(n_new,inner), temp2(n_new,inner);
         sum(a11, a22, temp1, n_new); // a11 + a22
         sum(b11, b22, temp2, n_new); // b11 + b22
@@ -199,7 +208,7 @@ void strassenRecursive(vector< vector<int> > &A,
         sum(p1, p3, temp13, n_new); // p1 + p3
         sum(temp13, p6, temp14, n_new); // p1 + p3 + p6
         subtract(temp14, p2, c22, n_new); // c22 = p1 + p3 - p2 + p6
-         */
+
 
         // Grouping the results obtained in a single matrix:
         for (int i = 0; i < n_new ; i++) {
@@ -245,13 +254,12 @@ int main (int argc, char* argv[]) {
     int d;
 
     if (argc==4) {
-        printf("test");
         char filename_buf[200];
         sscanf(argv[1], "%d", &flag);
         sscanf(argv[2], "%d", &d);
         sscanf(argv[3], "%s", filename_buf);
         filename = string(filename_buf).c_str();
-        printf("%s", filename.c_str());
+        //printf("%s \n", filename.c_str());
     }
 
     int threshold = 1;
@@ -260,12 +268,12 @@ int main (int argc, char* argv[]) {
 
     readFile (filename, d, A, B);
 
-    strassenPadded(A, B, C, d, threshold);
+    //strassenPadded(A, B, C, d, threshold);
 
-    printMatrix(A, d);
-    printMatrix(B, d);
-    //conventional(A, B, C, d);
-    printMatrix(C, d);
+    //printMatrix(A, d);
+    //printMatrix(B, d);
+    conventional(A, B, C, d);
+    //printMatrix(C, d);
 
     return 0;
 }

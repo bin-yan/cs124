@@ -1,0 +1,13 @@
+#!/bin/sh
+
+
+for d in 1 2 4 8 16 32 64 128 256 512 1024
+do
+
+    time (while ((n++ < 10)); do ./strassen 0 ${d} "/Users/binyan/Desktop/test${d}.txt"; done)
+    echo $d
+
+done
+
+
+
