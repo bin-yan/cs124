@@ -7,7 +7,6 @@
 #include <random>
 #include <fstream>
 #include <cstdint>
-#include <sstream>
 
 
 using namespace std;
@@ -295,11 +294,10 @@ int64_t hillClimbing_prepartition(int64_t A[], int n, int iterations) {
 }
 
 int64_t simulatedAnnealing_prepartition(int64_t A[], int n, int iterations) {
-    int64_t B[n], C[n];
+    int64_t B[n];
 
-    int64_t residue, residue_current, residue_check;
+    int64_t residue, residue_current;
     int j, k;
-    float prob;
 
     int p[n], p_current[n];
     generateRandomState(p,n);
@@ -320,65 +318,39 @@ int64_t simulatedAnnealing_prepartition(int64_t A[], int n, int iterations) {
         generateNewSequence(A, B, p_current, n);
         residue_current = KarmarkarKarpResidue(B,n);
 
-        prob = rand()/RAND_MAX;
-
         if(residue_current < residue) {
-            residue = residue_current;
-            copySmallArray(p_current, p, n);
-        } else if (prob <= (float)exp(-(residue_current - residue)/coolingFactor(i))){
             residue = residue_current;
             copySmallArray(p_current, p, n);
         } else {
             copySmallArray(p, p_current, n);
         }
 
-        if(residue < residue_check) {
-            residue_check = residue;
-        }
-
         //cout<<residue_current<<","<<residue<<endl;
 
     }
 
-    return residue_check;
+    return residue;
 
 }
 
-void generateRandomSequence(int64_t A[], int n) {
-    for (int i=0; i < n; i++) {
-        //A[i] = rand() % 100 + 1;
-        A[i] = ((RAND_MAX + (long)1)*(long)rand() + rand()) % (long)pow(10,12) + 1;
-    }
-}
-
-void readFile(string filename, int64_t A[], int n) {
-    string line;
-    std::fstream fs;
-    fs.open (filename, std::fstream::in);
-
-    int64_t a;
-
-    for (int i=0; i < n; i++) {
-            getline(fs, line);
-            istringstream iss(line);
-            iss >> a;
-            A[i] = a;
-    }
 
 
-    fs.close();
-}
+int main() {
 
-void experimentVersion(){
-
-    int n = 100, iterations = 30000, experiments = 50;
+    // Generate set A with n integers
+    srand((unsigned)time(NULL));
+    int n = 100, iterations = 1000, experiments = 1;
     int64_t	A[n], KK[n], RR[n], HC[n], SA[n];
     int64_t residue_KK[experiments], residue_RR[experiments], residue_HC[experiments], residue_SA[experiments];
     int64_t residue_RR_prepartition[experiments], residue_HC_prepartition[experiments], residue_SA_prepartition[experiments];
 
     for(int exp = 0; exp < experiments; exp++) {
 
-        generateRandomSequence(A, n);
+        for (int i=0; i < n; i++) {
+            //A[i] = rand() % 100 + 1;
+            A[i] = ((RAND_MAX + (long)1)*(long)rand() + rand()) % (long)pow(10,12) + 1;
+        }
+
 
         //printA(A, n);
         copyArray(A, KK, n);
@@ -394,98 +366,28 @@ void experimentVersion(){
         residue_SA[exp] = simulatedAnnealing(SA, n, iterations);
 
         residue_RR_prepartition[exp] = repeatedRandom_prepartition(A, n, iterations);
-
         residue_HC_prepartition[exp] = hillClimbing_prepartition(A, n, iterations);
-
-        residue_SA_prepartition[exp] = simulatedAnnealing_prepartition(A, n, iterations);
-
 
     }
 
     // print results
-    cout << "Karmarkar-Karp: Mean , Std | " << meanArray(residue_KK, experiments) << "," << stdArray(residue_KK, experiments) << endl;
-    cout << "Standard representation: repeated random: Mean , Std | " << meanArray(residue_RR, experiments) << "," << stdArray(residue_RR, experiments) << endl;
-    cout << "Standard representation: hill climbing: Mean , Std | " << meanArray(residue_HC, experiments) << "," << stdArray(residue_HC, experiments) << endl;
-    cout << "Standard representation: simulated annealing: Mean , Std | " << meanArray(residue_SA, experiments) << "," << stdArray(residue_SA, experiments) << endl;
+    /*
+    cout << meanArray(residue_KK, experiments) << "," << stdArray(residue_KK, experiments) << endl;
+    cout << meanArray(residue_RR, experiments) << "," << stdArray(residue_RR, experiments) << endl;
+    cout << meanArray(residue_HC, experiments) << "," << stdArray(residue_HC, experiments) << endl;
+    cout << meanArray(residue_SA, experiments) << "," << stdArray(residue_SA, experiments) << endl;
 
-    cout << "Prepartitioning: repeated random: Mean , Std | " << meanArray(residue_RR_prepartition, experiments) << "," << stdArray(residue_RR_prepartition, experiments) << endl;
-    cout << "Prepartitioning: hill climbing: Mean , Std | " << meanArray(residue_HC_prepartition, experiments) << "," << stdArray(residue_HC_prepartition, experiments) << endl;
-    cout << "Prepartitioning: simulated annealing: Mean , Std | " << meanArray(residue_SA_prepartition, experiments) << "," << stdArray(residue_SA_prepartition, experiments) << endl;
+    cout << meanArray(residue_RR_prepartition, experiments) << "," << stdArray(residue_RR_prepartition, experiments) << endl;
+    cout << meanArray(residue_HC_prepartition, experiments) << "," << stdArray(residue_HC_prepartition, experiments) << endl;
+*/
 
     ofstream myfile ("/Users/byan/Desktop/results.txt");
     if (myfile.is_open())
     {
         for (int i=0; i < experiments; i++)
-            myfile << residue_KK[i] <<"," << residue_RR[i] <<"," << residue_HC[i] <<"," << residue_SA[i] <<","
-            << residue_RR_prepartition[i] <<"," << residue_HC_prepartition[i] <<"," << residue_SA_prepartition[i] << endl;
+            myfile << residue_KK[i] <<"," << residue_RR[i] <<"," << residue_HC[i] <<"," << residue_SA[i]<< endl;
         myfile.close();
     }
-
-}
-
-void submittedVersion(string filename){
-
-    int n = 100, iterations = 30000;
-    int64_t	A[n], KK[n], RR[n], HC[n], SA[n];
-    int64_t residue_KK, residue_RR, residue_HC, residue_SA,
-            residue_RR_prepartition, residue_HC_prepartition, residue_SA_prepartition;
-
-    /*
-    // generate input file
-    generateRandomSequence(A, n);
-    ofstream myfile ("/Users/byan/Desktop/input.txt");
-    if (myfile.is_open())
-    {
-        for (int i=0; i < n; i++)
-            myfile << A[i] << endl;
-        myfile.close();
-    }
-     */
-
-    //readFile("/Users/byan/Desktop/input.txt", A, n);
-    readFile(filename, A, n);
-
-    copyArray(A, KK, n);
-    residue_KK = KarmarkarKarp(KK, n);
-
-    copyArray(A, RR, n);
-    residue_RR = repeatedRandom(RR, n, iterations);
-
-    copyArray(A, HC, n);
-    residue_HC = hillClimbing(HC, n, iterations);
-
-    copyArray(A, SA, n);
-    residue_SA = simulatedAnnealing(SA, n, iterations);
-
-    residue_RR_prepartition = repeatedRandom_prepartition(A, n, iterations);
-    residue_HC_prepartition = hillClimbing_prepartition(A, n, iterations);
-    residue_SA_prepartition = simulatedAnnealing_prepartition(A, n, iterations);
-
-    cout << "Karmarkar-Karp: " << residue_KK << endl;
-    cout << "Standard representation: repeated random: " << residue_RR << endl;
-    cout << "Standard representation: hill climbing: " << residue_HC << endl;
-    cout << "Standard representation: simulated annealing: " << residue_SA << endl;
-    cout << "Prepartitioning: repeated random: " << residue_RR_prepartition << endl;
-    cout << "Prepartitioning: hill climbimng: " << residue_HC_prepartition << endl;
-    cout << "Prepartitioning: simulated annealing: " << residue_SA_prepartition << endl;
-
-}
-
-
-int main(int argc, char* argv[]) {
-
-    srand((unsigned)time(NULL));
-
-    string filename;
-    if (argc==2) {
-        char filename_buf[200];
-        sscanf(argv[1], "%s", filename_buf);
-        filename = string(filename_buf).c_str();
-
-        submittedVersion(filename);
-    } else
-        experimentVersion();
-
 
     return 0;
 }
