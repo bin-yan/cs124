@@ -213,9 +213,9 @@ int main() {
     //printA(A, n);
 
     residue_KK = KarmarkarKarp(KK, n);
-    residue_RR = repeatedRandom(RR, n, 25000);
-    residue_HC = hillClimbing(HC, n, 25000);
-    residue_SA = simulatedAnnealing(SA, n, 25000);
+    residue_RR = repeatedRandom(RR, n, 100000);
+    residue_HC = hillClimbing(HC, n, 100000);
+    residue_SA = simulatedAnnealing(SA, n, 100000);
 
     // print results
     //printA(A, n);
